@@ -328,3 +328,20 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov3.weights
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov3.cfg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov3-wider_16000.weights
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov3-face.cfg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/team.JPG
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/Shinjuku.jpeg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/Rebun.jpeg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/kite.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/Kamikochi.jpeg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/horses.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/gender_net.caffemodel
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/dog.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/deploy_gender.prototxt
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/deploy_age.prototxt
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/coco.names
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/bali-crop.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/age_net.caffemodel
