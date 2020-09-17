@@ -32,7 +32,7 @@ namespace OpenCVCSharp.Example
             string cfgGenderCaffe = System.IO.Path.Combine(dir, "deploy_gender.prototxt");
 
             //Image Path
-            string testImage = System.IO.Path.Combine(dir, "friends.jpg");
+            string testImage = System.IO.Path.Combine(dir, "team.jpg");
 
 
             using (NetYoloV3 yoloV3 = new NetYoloV3())
