@@ -29,7 +29,7 @@ namespace OpenCVCSharpDNN.Impl
         /// <param name="minProbability">Min probability to get label</param>
         /// <param name="labelsFilters">Label to filters</param>
         /// <returns>Net Result</returns>
-        protected override NetResult[] BeginDetect(Bitmap img, float minProbability = 0.3F, string[] labelsFilters = null)
+        protected override NetResult[] BeginDetect(Bitmap img, float minProbability = 0.85F, string[] labelsFilters = null, float nmsThreshold = 1)
         {
             using (Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat(img))
             {

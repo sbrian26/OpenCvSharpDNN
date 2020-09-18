@@ -18,20 +18,20 @@ namespace OpenCVCSharpDNN
 
         public string[] Labels { get; protected set; }
 
-        public NetResult[] Detect(Bitmap img, float minProbability = 0.3F, string[] labelsFilters = null)
+        public NetResult[] Detect(Bitmap img, float minProbability = 0.3F, string[] labelsFilters = null, float nmsThreshold = 0.3F)
         {
             if (!Initialized)
                 throw new Exception("The model has not yet initialized or is empty.");
 
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            var result = BeginDetect(img, minProbability, labelsFilters);
+            var result = BeginDetect(img, minProbability, labelsFilters,nmsThreshold);
             watch.Stop();
             Debug.WriteLine($"The detect of the model {this.GetType().Name} has taken {watch.ElapsedMilliseconds} milliseconds");
             return result;
         }
 
-        protected abstract NetResult[] BeginDetect(Bitmap img, float minProbability = 0.3F, string[] labelsFilters = null);
+        protected abstract NetResult[] BeginDetect(Bitmap img, float minProbability = 0.3F, string[] labelsFilters = null, float nmsThreshold = 1);
 
 
         protected abstract void InitializeModel(string pathModel, string pathConfig);
@@ -57,8 +57,8 @@ namespace OpenCVCSharpDNN
             InitializeModel(pathModel, pathConfig);
             if (network == null || network.Empty())
                 throw new Exception("The model has not yet initialized or is empty.");
-            network.SetPreferableBackend((int)backend);
-            network.SetPreferableTarget((int)target);
+            network.SetPreferableBackend(Net.Backend.DEFAULT );
+            network.SetPreferableTarget( Net.Target.CPU );
 
             this.Labels = labels;
             this.Initialized = true;

@@ -345,3 +345,11 @@ ASALocalRun/
 /OpenCVCSharpDNN/OpenCVCSharp.Example/data/coco.names
 /OpenCVCSharpDNN/OpenCVCSharp.Example/data/bali-crop.jpg
 /OpenCVCSharpDNN/OpenCVCSharp.Example/data/age_net.caffemodel
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov4.weights
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov4.cfg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov4-tiny.weights
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/yolov4-tiny.cfg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/cheer.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/compressedFace.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/compressedINCITS385Face.jpg
+/OpenCVCSharpDNN/OpenCVCSharp.Example/data/win1.jpg

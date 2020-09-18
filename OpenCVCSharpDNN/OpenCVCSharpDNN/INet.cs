@@ -14,6 +14,6 @@ namespace OpenCVCSharpDNN
         void Initialize(string pathModel, string pathConfig, string pathLabels, BackendEnums backend = BackendEnums.Default, TargetEnums target = TargetEnums.Cpu);
 
 
-        NetResult[] Detect(Bitmap img, float minProbability = 0.3f, string[] labelsFilters = null);
+        NetResult[] Detect(Bitmap img, float minProbability = 0.3f, string[] labelsFilters = null, float nmsThreshold = 1);
     }
 }
