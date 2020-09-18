@@ -31,25 +31,23 @@ namespace OpenCVCSharpDNN.Impl
         /// </summary>
         private string[] valuesConfig;
 
+        public int netWidth { get; set; }
+        public int netHeight { get; set; }
 
         protected override NetResult[] BeginDetect(Bitmap img, float minProbability = 0.3F, string[] labelsFilters = null, float nmsThreshold = 0.3F)
         {
-
-            //Extract width and height from config file
-            ExtractValueFromConfig("width", out int widthBlob);
-            ExtractValueFromConfig("height", out int heightBlob);
-
+            
             using (Mat mat = OpenCvSharp.Extensions.BitmapConverter.ToMat(img))
             {
 
                 //Create the blob
-                using (var blob = CvDnn.BlobFromImage(mat, Scale, size: new OpenCvSharp.Size(widthBlob, heightBlob), crop: false))
+                using (var blob = CvDnn.BlobFromImage(mat, Scale, size: new OpenCvSharp.Size(netWidth, netHeight), crop: false))
                 {
                     //Set blob of a default layer
                     network.SetInput(blob);
 
                     //Get all out layers
-                    string[] outLayers = network.GetUnconnectedOutLayersNames();
+                    string[] outLayerNames = network.GetUnconnectedOutLayersNames();
 
                     //Initialize all blobs for the all out layers
                     // The long way:
@@ -58,13 +56,12 @@ namespace OpenCVCSharpDNN.Impl
                     //    result[i] = new Mat();
                     //}
                     // The short way
-                    var result = outLayers.Select(_ => new Mat()).ToArray();
+                    var outLayerMats = outLayerNames.Select(_ => new Mat()).ToArray();
                     
                     ///Execute all out layers
-                    network.Forward(result, outLayers);
+                    network.Forward(outLayerMats, outLayerNames);
 
-                    var yolos = GetResult(result, mat, minProbability, nmsThreshold);
-
+                    var yolos = PrepareResults(outLayerMats, mat.Width ,mat.Height , minProbability, nmsThreshold, labelsFilters, Labels);
 
                     //Build NetResult
                     List<NetResult> netResults = new List<NetResult>();
@@ -97,9 +94,6 @@ namespace OpenCVCSharpDNN.Impl
                     //                }
                     //            }
 
-
-
-
                     //            //The probability is the max value
                     //            double probability = max;
 
@@ -119,20 +113,20 @@ namespace OpenCVCSharpDNN.Impl
                     //    }
                     //}
                     #endregion
+                    
                     return netResults.ToArray();
                 }
             }
         }
-        private static (List<Rect2d> boxes, int[] indices, List<int> classIds, List<float> confidences, List<float> probabilities) GetResult(IEnumerable<Mat> output, Mat image, float threshold, float nmsThreshold)
+        private static (List<Rect2d> boxes, int[] indices, List<int> classIds, List<float> confidences, List<float> probabilities) 
+        PrepareResults(IEnumerable<Mat> forwardOutput, int imgWidth, int imgHeight, float threshold, float nmsThreshold, string[] labelsFilters,string[] Labels)
         {
             //for nms
             var classIds = new List<int>();
             var confidences = new List<float>();
             var probabilities = new List<float>();
             var boxes = new List<Rect2d>();
-
-            var w = image.Width;
-            var h = image.Height;
+                        
             /*
              YOLO3 COCO trainval output
              0 1 : center                    2 3 : w/h
@@ -140,7 +134,7 @@ namespace OpenCVCSharpDNN.Impl
             */
             const int prefix = 5;   //skip 0~4
 
-            foreach (var prob in output)
+            foreach (var prob in forwardOutput)
             {
                 for (var i = 0; i < prob.Rows; i++)
                 {
@@ -149,19 +143,27 @@ namespace OpenCVCSharpDNN.Impl
                     {
                         //get classes probability
                         Cv2.MinMaxLoc(prob.Row(i).ColRange(prefix, prob.Cols), out _, out OpenCvSharp.Point max);
-                        var classes = max.X;
-                        var probability = prob.At<float>(i, classes + prefix);
+                        var classIndex = max.X;
+                        
+                        string label = Labels[classIndex];
+                        if (labelsFilters != null)
+                          if (!labelsFilters.Contains(label))
+                                continue;
+                        
+                        var probability = prob.At<float>(i, classIndex + prefix);
 
-                        if (probability > threshold) //more accuracy, you can cancel it
+                        if (probability >= threshold) //more accuracy, you can cancel it
                         {
+
+
                             //get center and width/height
-                            var centerX = prob.At<float>(i, 0) * w;
-                            var centerY = prob.At<float>(i, 1) * h;
-                            var width = prob.At<float>(i, 2) * w;
-                            var height = prob.At<float>(i, 3) * h;
+                            var centerX = prob.At<float>(i, 0) * imgWidth;
+                            var centerY = prob.At<float>(i, 1) * imgHeight;
+                            var width = prob.At<float>(i, 2) * imgWidth;
+                            var height = prob.At<float>(i, 3) * imgHeight;
 
                             //put data to list for NMSBoxes
-                            classIds.Add(classes);
+                            classIds.Add(classIndex);
                             confidences.Add(confidence);
                             probabilities.Add(probability);
                             boxes.Add(new Rect2d(centerX, centerY, width, height));
@@ -172,16 +174,12 @@ namespace OpenCVCSharpDNN.Impl
 
             //using non-maximum suppression to reduce overlapping low confidence box
             CvDnn.NMSBoxes(boxes, confidences, threshold, nmsThreshold, out int[] indices);
-
-            Console.WriteLine($"NMSBoxes drop {confidences.Count - indices.Length} overlapping result.");
-
-            //foreach (var i in indices)
-            //{
-            //    var box = boxes[i];
-            //    Draw(image, classIds[i], confidences[i], probabilities[i], box.X, box.Y, box.Width, box.Height);
-            //}
+            Console.WriteLine($"NMSBoxes drop {confidences.Count - indices.Length} overlapping result(s).");
+                
             return (boxes, indices, classIds, confidences, probabilities);
         }
+
+
         /// <summary>
         /// Initialize the model
         /// </summary>
@@ -193,6 +191,12 @@ namespace OpenCVCSharpDNN.Impl
 
             ///Initialize darknet network
             network = CvDnn.ReadNetFromDarknet(pathConfig, pathModel);
+
+            //Extract width and height from config file
+            ExtractValueFromConfig("width", out int blobWidth);
+            netWidth = blobWidth;
+            ExtractValueFromConfig("height", out int blobHeight);
+            netHeight = blobHeight;
 
             //Set the scale 1 / 255
             this.Scale = 0.00392;

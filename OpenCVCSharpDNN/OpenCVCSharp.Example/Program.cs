@@ -37,10 +37,9 @@ namespace OpenCVCSharp.Example
             string cfgGenderCaffe = System.IO.Path.Combine(dir, "deploy_gender.prototxt");
             double threshold = 0.6;
             //Image Path
-            string testImage = System.IO.Path.Combine(dir, "cheer.jpg");
+            string testImage = System.IO.Path.Combine(dir, "Shinjuku.jpeg");
 
-
-            using (NetYoloV3 yoloV3 = new NetYoloV3())
+                        using (NetYoloV3 yoloV3 = new NetYoloV3())
             using (NetYoloV3 yoloV3Faces = new NetYoloV3())
             using (NetCaffeAgeGender caffeGender = new NetCaffeAgeGender())
             using (Bitmap bitmap = new Bitmap(testImage))
@@ -52,11 +51,10 @@ namespace OpenCVCSharp.Example
                 yoloV3Faces.Initialize(modelFace, cfgFace, new string[] { "faces" });
                 caffeGender.Initialize(modelGenderCaffe, cfgGenderCaffe, new string[] { "Male", "Female" });
 
-
                 //Get result of YoloV3
                NetResult[] resultPersons = yoloV3.Detect(bitmap, labelsFilters: new string[] { "person" },minProbability: 0 , nmsThreshold: 0.3F);
                 //using non-maximum suppression to reduce overlapping low confidence box
-                                //Get result of YoloV3 faces train
+                //Get result of YoloV3 faces train
                 //NetResult[] resultFaces = yoloV3Faces.Detect(bitmap);
 
                 using (Graphics canvas = Graphics.FromImage(resultImage))
